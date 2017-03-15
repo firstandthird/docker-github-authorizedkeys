@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+docker build -t github-auth .
+sudo rm -fr .test
+mkdir .test
+USERS="jgallen23"
+docker run -v $(pwd)/.test:/user -e GITHUB_USERS="$USERS" github-auth
+sudo cat .test/.ssh/authorized_keys | grep "jgallen23" > /dev/null 2>&1
+echo "=> Test passed"

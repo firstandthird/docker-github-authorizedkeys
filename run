@@ -1,0 +1,18 @@
+#!/bin/sh
+if [[ -z "${GITHUB_USERS}" ]]; then
+  echo "Must set GITHUB_USERS"
+  exit 1
+fi
+mkdir -p /user/.ssh
+chmod 700 /user/.ssh
+touch /user/.ssh/authorized_keys
+chmod 600 /user/.ssh/authorized_keys
+ARR=$(echo ${GITHUB_USERS} | tr "," "\n")
+for USER in $ARR; do
+
+  echo "Adding keys for $USER"
+
+  echo "#### $USER ####" >> /user/.ssh/authorized_keys
+  curl https://github.com/$USER.keys >> /user/.ssh/authorized_keys
+  echo "#### END $USER ####" >> /user/.ssh/authorized_keys
+done
