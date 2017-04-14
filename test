@@ -1,10 +1,34 @@
 #!/bin/bash
 
-set -e
-docker build -t github-auth .
 sudo rm -fr .test
+docker build -t github-auth .
 mkdir .test
-USERS="jgallen23"
+USERS="jgallen23,dawnerd"
 docker run -v $(pwd)/.test:/user -e GITHUB_USERS="$USERS" github-auth
 sudo cat .test/.ssh/authorized_keys | grep "jgallen23" > /dev/null 2>&1
+if [[ "$?" != 0 ]]; then
+  echo "failed"
+  exit 1
+fi
+sudo cat .test/.ssh/authorized_keys | grep "dawnerd" > /dev/null 2>&1
+if [[ "$?" != 0 ]]; then
+  echo "failed"
+  exit 1
+fi
+
+
+#CHANGE IT UP
+USERS="dawnerd"
+docker run -v $(pwd)/.test:/user -e GITHUB_USERS="$USERS" github-auth
+sudo cat .test/.ssh/authorized_keys | grep "dawnerd" > /dev/null 2>&1
+if [[ "$?" != 0 ]]; then
+  echo "failed"
+  exit 1
+fi
+sudo cat .test/.ssh/authorized_keys | grep "jgallen23" > /dev/null 2>&1
+if [[ "$?" != 1 ]]; then
+  echo "failed"
+  exit 1
+fi
 echo "=> Test passed"
+sudo cat .test/.ssh/authorized_keys
